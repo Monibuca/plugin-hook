@@ -43,6 +43,12 @@ var plugin = InstallPlugin(&HookConfig{
 func (h *HookConfig) OnEvent(event any) {
 	switch v := event.(type) {
 	case FirstConfig:
+		if h.RequestList == nil {
+			h.RequestList = make(map[string]*HookAddr)
+		}
+		if h.URLList == nil {
+			h.URLList = make(map[string]string)
+		}
 		if h.BaseURL != "" {
 			for k, u := range h.URLList {
 				if !strings.HasSuffix(u, "http") {
