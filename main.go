@@ -75,7 +75,7 @@ func (h *HookConfig) OnEvent(event any) {
 				h.RequestList[k] = &HookAddr{URL: u, Method: "POST", Header: h.Header}
 			}
 		}
-		h.request("startup", nil)
+		h.request(&HookData{Event: "startup"})
 		var heartreq []*HookAddr
 		if v, ok := h.RequestList["keepalive"]; ok {
 			heartreq = append(heartreq, v)
@@ -96,30 +96,30 @@ func (h *HookConfig) OnEvent(event any) {
 			}(heartreq...)
 		}
 	case SEpublish:
-		h.request("publish", v.Stream)
+		h.request(&HookData{Event: "publish", Stream: v.Stream})
 	case SEclose:
-		h.request("streamClose", v.Stream)
+		h.request(&HookData{Event: "streamClose", Stream: v.Stream})
 	case ISubscriber:
-		h.request("subscribe", v.GetIO().Stream)
+		h.request(&HookData{Event: "subscribe", Stream: v.GetIO().Stream, Extra: map[string]interface{}{"subscriber": v.GetIO()}})
 	}
 }
-func (h *HookConfig) request(event string, stream *Stream) {
-	if req, ok := h.RequestList[event]; ok {
-		go h.doRequest(req, &HookData{
-			Stream: stream,
-			Event:  event,
-		})
+func (h *HookConfig) request(hookData *HookData) {
+	if req, ok := h.RequestList[hookData.Event]; ok {
+		go h.doRequest(req, hookData)
 	}
 	if req, ok := h.RequestList["*"]; ok {
-		go h.doRequest(req, &HookData{
-			Stream: stream,
-			Event:  event,
-		})
+		go h.doRequest(req, hookData)
 	}
 }
 func (h *HookConfig) doRequest(req *HookAddr, data *HookData) (err error) {
 	data.Time = time.Now().Unix()
-	data.Extra = h.Extra
+	if data.Extra == nil {
+		data.Extra = h.Extra
+	} else {
+		for k, v := range h.Extra {
+			data.Extra[k] = v
+		}
+	}
 	param, _ := json.Marshal(data)
 	var resp *http.Response
 	// Execute the request
