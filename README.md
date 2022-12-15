@@ -36,6 +36,7 @@ hook:
     startup: "http://www.example.com" # m7s启动时发送请求
     publish: "http://www.example.com/publish" # 发布时发送请求
     subscribe: "http://www.example.com/subscribe" # 订阅时发送请求
+    unsubscribe: "http://www.example.com/unsubscribe" # 取消订阅时发送请求
     streamClose: "http://www.example.com/streamClose" # 流关闭时发送请求
     keepalive: "http://www.example.com/keepalive" # 心跳时发送请求
 ```

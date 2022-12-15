@@ -100,7 +100,9 @@ func (h *HookConfig) OnEvent(event any) {
 	case SEclose:
 		h.request(&HookData{Event: "streamClose", Stream: v.Stream})
 	case ISubscriber:
-		h.request(&HookData{Event: "subscribe", Stream: v.GetIO().Stream, Extra: map[string]interface{}{"subscriber": v.GetIO()}})
+		h.request(&HookData{Event: "subscribe", Stream: v.GetSubscriber().Stream, Extra: map[string]interface{}{"subscriber": v}})
+	case UnsubscribeEvent:
+		h.request(&HookData{Event: "unsubscribe", Stream: v.Subscriber.GetSubscriber().Stream, Extra: map[string]interface{}{"subscriber": v.Subscriber}})
 	}
 }
 func (h *HookConfig) request(hookData *HookData) {
