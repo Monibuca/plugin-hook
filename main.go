@@ -96,13 +96,13 @@ func (h *HookConfig) OnEvent(event any) {
 			}(heartreq...)
 		}
 	case SEpublish:
-		h.request(&HookData{Event: "publish", Stream: v.Stream})
+		h.request(&HookData{Event: "publish", Stream: v.Target})
 	case SEclose:
-		h.request(&HookData{Event: "streamClose", Stream: v.Stream})
+		h.request(&HookData{Event: "streamClose", Stream: v.Target})
 	case ISubscriber:
 		h.request(&HookData{Event: "subscribe", Stream: v.GetSubscriber().Stream, Extra: map[string]interface{}{"subscriber": v}})
 	case UnsubscribeEvent:
-		h.request(&HookData{Event: "unsubscribe", Stream: v.Subscriber.GetSubscriber().Stream, Extra: map[string]interface{}{"subscriber": v.Subscriber}})
+		h.request(&HookData{Event: "unsubscribe", Stream: v.Target.GetSubscriber().Stream, Extra: map[string]interface{}{"subscriber": v.Target}})
 	}
 }
 func (h *HookConfig) request(hookData *HookData) {
